@@ -291,10 +291,8 @@ export class DataObjects {
       let dtype_class = dtype[0]
       for (var i = 0; i < count; i++) {
         if (dtype_class == 'VLEN_STRING') {
-          let character_set = dtype[2];
           var [vlen, vlen_data] = this._vlen_size_and_data(buf, offset);
-          const encoding = (character_set == 0) ? "ascii" : "utf-8";
-          const decoder = new TextDecoder(encoding);
+          const decoder = new TextDecoder("utf-8");
           value[i] = decoder.decode(vlen_data);
           offset += 16
         }
@@ -518,19 +516,15 @@ export class DataObjects {
       offset += 8;
     }
 
-    let link_name_character_set = 0;
     if (link_name_character_set_field_present) {
-      link_name_character_set = struct.unpack_from('<B', data, offset)[0]
       offset += 1
     }
-
-    let encoding = (link_name_character_set == 0) ? 'ascii' : 'utf-8';
 
     let name_size_fmt = ["<B", "<H", "<I", "<Q"][flags & 3];
     let name_size = struct.unpack_from(name_size_fmt, data, offset)[0];
     offset += size_of_length_of_link_name;
 
-    let name = new TextDecoder(encoding).decode(data.slice(offset, offset + name_size));
+    let name = new TextDecoder('utf-8').decode(data.slice(offset, offset + name_size));
     offset += name_size
 
     let address;
@@ -543,7 +537,7 @@ export class DataObjects {
       //# soft link
       let length_of_soft_link_value = struct.unpack_from('<H', data, offset)[0];
       offset += 2
-      address = new TextDecoder(encoding).decode(data.slice(offset, offset + length_of_soft_link_value));
+      address = new TextDecoder('utf-8').decode(data.slice(offset, offset + length_of_soft_link_value));
     }
 
     return [creationorder, [name, address]];
@@ -702,9 +696,7 @@ export class DataObjects {
         return ref_addresses;
       }
       else if (dtype_class == 'VLEN_STRING') {
-        let character_set = this.dtype[2];
-        const encoding = (character_set == 0) ? "ascii" : "utf-8";
-        const decoder = new TextDecoder(encoding);
+        const decoder = new TextDecoder('utf-8');
         var value = [];
         for (var i = 0; i < fullsize; i++) {
           const [vlen, vlen_data] = this._vlen_size_and_data(this.fh, data_offset);
@@ -745,9 +737,7 @@ export class DataObjects {
         }
         let vlen_data = gheap.objects.get(object_index);
         if (dtype_class == 'VLEN_STRING') {
-          let character_set = this.dtype[2];
-          const encoding = (character_set == 0) ? "ascii" : "utf-8";
-          const decoder = new TextDecoder(encoding);
+          const decoder = new TextDecoder('utf-8');
           data[i] = decoder.decode(vlen_data);
         }
       }
